@@ -1,19 +1,28 @@
 # Welcome to Pivot.js
 
-Pivot.js is a simple way for you to get to your data.  It allows for the
-creation of highly customizable unique table views from your browser.
+This is a fork of [rwjblue's pivot.js](http://rwjblue.github.com/pivot.js/) which was originally designed to have one pivot and DataTables object instance at a time.
+Since there had been some requests by others to make this multi-instanceable, I did a complete rewrite of pivot.js and jquery_pivot.js.
 
-> In data processing, a pivot table is a data summarization tool found in
-> data visualization programs such as spreadsheets or business intelligence
-> software. Among other functions, pivot-table tools can automatically sort,
-> count, total or give the average of the data stored in one table or
-> spreadsheet. It displays the results in a second table (called a "pivot
-> table") showing the summarized data.
+For some generic information about the basic functionality of pivot.js please visit [this page](http://rwjblue.github.com/pivot.js/).
 
-In our case, results (or the pivot-table) will be displayed as an HTML table
-pivoting from the input data (CSV or JSON). Without further ado let's get to usage.
+This library consists of multiple files and functionalites:
 
-## View an [example](http://rwjblue.github.com/pivot.js/) or view the [Docs](http://rwjblue.github.com/pivot.js/docs/index.html#!/api/Pivot) for more information.
+* `pivot.js` - The (mostly) original pivot object from `rwjblue`
+* `pivot_table.js` - This is the original jquery_pivot.js but with less functionality and in another context.
+  It now only supports creating the DataTable and binds several jQuery events.
+  Also this is now better known as a plugin.
+* `jquery_pivot_table.js` - The jQuery multi-instance plugin for `pivot_table.js`
+* `pivot_chart.js` - Another plugin that uses HighCharts to visualize the pivot data
+* `jquery_pivot_chart.js` - The jQuery multi-instance plugin for `pivot_chart.js`
+* `pivot_controller.js` - 
+
+Some more functionality:
+
+ * All DOM elements are configurable via a basic templating system.
+   This means to you that you have __full control__ over the generated HTML code.
+ * jQuery events for __ultimate control__ over what happens at which time.
+
+## View an [example](http://github.com/dirtyequi/pivot.js/) or view the [Docs](http://rwjblue.github.com/pivot.js/docs/index.html#!/api/Pivot) for more information.
 
 #Usage
 
@@ -25,13 +34,17 @@ Step one is to initialize the pivot object.  It expects the following attributes
 * `json` - which should contain a valid JSON string. At this time this string
   must be an array of arrays, and not an array of objects (storing the field
   names with each row consumes significantly more space).
+* `url` - which may contain a string with an URL from where to retrieve your
+  data or a function that must return the URL.
 * `fields` - which should be an array of objects.  This is used to instruct
   pivot on how to interact with the fields you pass in.  It keys off of the
   header row names.  And is formated like so:
 
 ```javascript
- [ {name: 'header-name', type: 'string', optional_attributes: 'optional field' },
- {name: 'header-name', type: 'string', optional_attributes: 'optional field' }]
+ [
+   {  name: 'header-name', type: 'string', optional_attributes: 'optional field' },
+   {  name: 'header-name', type: 'string', optional_attributes: 'optional field' }
+ ]
 
 ```
 (<small>See more about fields in Section below</small>)
@@ -89,7 +102,8 @@ pivot.init({json: json_string, fields: field_definitions});
 
 # Authors
 
-Pivot.js is the work of Robert Jackson and Jonathan Jackson.
+The original Pivot.js is the work of Robert Jackson and Jonathan Jackson.
+Other files contributed to this repository are the work of Tristan Cebulla.
 
 ## License
 
