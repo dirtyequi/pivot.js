@@ -11,19 +11,27 @@ This library consists of multiple files and functionalites:
 * `pivot_table.js` - This is the original jquery_pivot.js but with less functionality and in another context.
   It now only supports creating the DataTable and binds several jQuery events.
   Also this is now better known as a plugin.
-* `jquery_pivot_table.js` - The jQuery multi-instance plugin for `pivot_table.js`
-* `pivot_chart.js` - Another plugin that uses HighCharts to visualize the pivot data
-* `jquery_pivot_chart.js` - The jQuery multi-instance plugin for `pivot_chart.js`
-* `pivot_controller.js` - 
+* `pivot_chart.js` - Another plugin that uses HighCharts to visualize the pivot data.
+* `pivot_controller.js` - Contains functionality to display the current pivot settings.
+  This was moved out of the original `jquery_pivot.js`.
 
+
+jQuery-Plugins:
+
+ * `jquery_pivot_table.js` - The jQuery multi-instance plugin for `pivot_table.js`
+ * `jquery_pivot_chart.js` - The jQuery multi-instance plugin for `pivot_chart.js`
+
+  
 Some more functionality:
 
  * All DOM elements are configurable via a basic templating system.
    This means to you that you have __full control__ over the generated HTML code.
  * All predefined templates are bootstrap3-ready. Yay! ^^
  * jQuery events for __ultimate control__ over what happens at which time.
+ * Extended configuration options - don't mess up with that.
 
 ## View an [example](http://dirtyequi.github.com/pivot.js/) or view the [Docs](http://dirtyequi.github.com/pivot.js/docs/index.html#!/api/Pivot) for more information.
+
 
 #Usage
 
@@ -54,28 +62,29 @@ This is done by:
   header row names.  And is formated like so:
 
 ```javascript
- [
-   {  name: 'header-name', type: 'string', optional_attributes: 'optional field' },
-   {  name: 'header-name', type: 'string', optional_attributes: 'optional field' }
- ]
-
+ {
+ 	fields: [
+   		{  name: 'header-name', type: 'string', optional_attributes: 'optional field' },
+   		{  name: 'header-name', type: 'string', optional_attributes: 'optional field' }
+ 	],
+}
 ```
 (<small>See more about fields in Section below</small>)
 
 * `filters` (default is empty) - which should contain any filters you would like to restrict your data to.  A filter is defined as an object like so:
 
 ```javascript
-{ zip_code: '34471' }
-
+{
+	filters: { zip_code: '34471' },
+}
 ```
 
 Those are the options that you should consider.
-There are other options that are well covered in the (documentation)[http://dirtyequi.github.com/pivot.js/docs/index.html#!/api/Pivot].
+There are other options that are well covered in the [documentation](http://dirtyequi.github.com/pivot.js/docs/index.html#!/api/Pivot).
 
-A valid pivot could then be set up from like so.
+A valid Pivot could then be set up from like so:
 
 ```javascript
-
 var field_definitions = [{name: 'last_name',   type: 'string',   filterable: true},
         {name: 'first_name',        type: 'string',   filterable: true},
         {name: 'zip_code',          type: 'integer',  filterable: true},
@@ -83,11 +92,11 @@ var field_definitions = [{name: 'last_name',   type: 'string',   filterable: tru
         {name: 'billed_amount',     type: 'float',    rowLabelable: false},
         {name: 'last_billed_date',  type: 'date',     filterable: true}
 
+
 // from csv data:
 var csv_string  =  "last_name,first_name,zip_code,billed_amount,last_billed_date\n" +
                    "Jackson,Robert,34471,100.00,\"Tue, 24 Jan 2012 00:00:00 +0000\"\n" +
                    "Jackson,Jonathan,39401,124.63,\"Fri, 17 Feb 2012 00:00:00 +0000\""
-
 var p = new Pivot({
 	csv: 	csv_string,
 	fields:	field_definitions,
@@ -98,32 +107,98 @@ var p = new Pivot({
 var json_string = '[["last_name","first_name","zip_code","billed_amount","last_billed_date"],' +
                     ' ["Jackson", "Robert", 34471, 100.00, "Tue, 24 Jan 2012 00:00:00 +0000"],' +
                     ' ["Smith", "Jon", 34471, 173.20, "Mon, 13 Feb 2012 00:00:00 +0000"]]'
-
 var p = new Pivot({
 	json: 	json_string,
 	fields:	field_definitions,
 });
 ```
 
+__This won't display anything__, it even won't pivot your data. Read the next chapters to
+learn how to visualize your data.
+
+
+# Visualizing with DataTables and Highcharts
+
+In order to visualize your data you need to create jQuery plugin instances of PivotTable and/or PivotChart:
+
+```javascript
+// for PivotTable
+$('#pivot-table').PivotTable({
+	pivot:	p,
+});
+
+
+// for PivotChart
+$('#pivot-chart').PivotChart({
+	pivot:	p,
+});
+
+// of course the corresponding DOM elements like <div id="pivot-chart"></div> have to be present.
+```
+
+And that's it. Fore more options see the documentation for [PivotTable]() and [PivotChart]().
+
+
+# Visualizing with PivotController
+
+You may want to go the easy way by using the PivotController (which is basically a good idea, because
+this plugin provides the pivot controls (filters, row-label fields, column-label fields and summary-fields)
+, besides it also provides a list of configuration for predefined reports.
+
+The PivotController plugin can handle the PivotTable and PivotChart plugins and fires update-events 
+every time your selection has changed.
+
+```javascript
+$('#pivot-controller').PivotController({
+	pivot:		p,
+	pluings:	[
+		{
+			id: 	'#pivot-chart',
+			name:	'PivotChart',
+			options:{
+			}
+		},
+		{
+			id: 	'#pivot-table',
+			name:	'PivotTable',
+			options:{
+			}
+		},		
+	],
+});
+```
+
+Et voila, your pivot controls, pivot table and pivot charts are there. Ready for action. Isn't that cool?
+
+FIXME: autogeneration of elements is still missing. Docs are incomplete.
+
+
+# Dependencies
+
+ * jQuery (tested with 1.9.1)
+ * DataTables (tested with 1.10.2)
+ * HighCharts (tested with 4.0.3)
+ * node-uuid
+
+This library works best with the mentioned versions of each depending library. You also should 
+think about [Bootstrap 3](http://www.getbootstrap.com/).
+
+
 # Wiki
 
-* [Filters](https://github.com/rwjblue/pivot.js/wiki/Filters)
-* [Labels](https://github.com/rwjblue/pivot.js/wiki/Labels)
-* [Summaries](https://github.com/rwjblue/pivot.js/wiki/Summaries)
-* [Integrating with jQuery](https://github.com/rwjblue/pivot.js/wiki/Integrating-with-jQuery)
-* [jQuery Supporting Cast](https://github.com/rwjblue/pivot.js/wiki/jQuery_pivot-Supporting-Cast)
-* [Integrating with DataTables](https://github.com/rwjblue/pivot.js/wiki/Integrating-with-Datatables)  (__Highly Recommend__)
-* [Contribute](https://github.com/rwjblue/pivot.js/wiki/Contributing)
-* [DOCS](http://rwjblue.github.com/pivot.js/docs/index.html#!/api/Pivot)
+...still to come...
+
 
 # Articles
 
 * [Introducing Pivot.js](http://jonathan-jackson.net/2012/04/10/introducing-pivotjs) - Jonathan Jackson
 
+
 # Authors
 
 The original Pivot.js is the work of Robert Jackson and Jonathan Jackson.
 Other files contributed to this repository are the work of Tristan Cebulla.
+
 
 ## License
 
